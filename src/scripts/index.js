@@ -2,7 +2,6 @@ import './../pages/index.css';
 import { initialCards } from './cards';
 import { createCard, deleteCard, handleLike } from './components/card.js';
 import { openModal, closeModal, handleOverlayClick, handleEscapeKey } from './components/modal.js';
-import { getProfileInfo, handleProfileFormSubmit } from './components/profile.js';
 
 const cardTemplate = document.querySelector('#card-template');
 const placesList = document.querySelector('.places__list');
@@ -19,45 +18,70 @@ const profileAddForm = profileAddPopup.querySelector('.popup__form');
 
 const imagePopup = document.querySelector('.popup_type_image');
 const imageCloseButton = imagePopup.querySelector('.popup__close');
+const popupImage = imagePopup.querySelector('.popup__image');
+const popupCaption = imagePopup.querySelector('.popup__caption');
+
+const nameInput = profileForm.querySelector('.popup__input_type_name');
+const descriptionInput = profileForm.querySelector('.popup__input_type_description');
+
+const profileTitle = document.querySelector('.profile__title');
+const profileDescription = document.querySelector('.profile__description');
+
+const linkInput = document.querySelector('.popup__input_type_url');
+
+function setProfileInfo(name, description) {
+  profileTitle.textContent = name;
+  profileDescription.textContent = description;
+}
+
+function getProfileInfo() {
+  return {
+    name: profileTitle.textContent,
+    description: profileDescription.textContent
+  };
+}
+
+function handleProfileFormSubmit(evt, popup) {
+  evt.preventDefault();
+  
+  setProfileInfo(nameInput.value, descriptionInput.value);
+  closeModal(popup)
+} 
 
 initialCards.forEach(cardData => {
-  const cardElement = createCard(cardData, deleteCard, cardTemplate, imagePopup, handleLike);
+  const cardElement = createCard(cardData, deleteCard, cardTemplate, handleLike, onCardImageClick);
   placesList.append(cardElement);
 });
 
 profileEditButton.addEventListener('click', () => {
   const { name, description } = getProfileInfo();
-  const nameInput = profileForm.querySelector('.popup__input_type_name');
-  const descriptionInput = profileForm.querySelector('.popup__input_type_description');
-  
   nameInput.value = name;
   descriptionInput.value = description;
   
   openModal(profileEditPopup);
 });
 
-function handleAddCardFormSubmit(evt, popup, cardTemplate, imagePopup) {
+function handleAddCardFormSubmit(evt, popup, cardTemplate) {
   evt.preventDefault();
-  
   const form = evt.target;
-  const nameInput = form.querySelector('.popup__input_type_card-name');
-  const linkInput = form.querySelector('.popup__input_type_url');
   
   const cardData = {
     name: nameInput.value,
     link: linkInput.value
   };
   
-  const cardElement = createCard(cardData, deleteCard, cardTemplate, imagePopup, handleLike);
-  const placesList = document.querySelector('.places__list');
-  
+  const cardElement = createCard(cardData, deleteCard, cardTemplate, handleLike, onCardImageClick);
   placesList.insertBefore(cardElement, placesList.firstChild);
-  
   form.reset();
-  popup.classList.remove('popup_is-opened');
+  closeModal(popup)
 } 
 
-
+function onCardImageClick(cardData) {
+  popupImage.src = cardData.link;
+  popupImage.alt = cardData.name;
+  popupCaption.textContent = cardData.name;
+  openModal(imagePopup);
+}
 
 profileForm.addEventListener('submit', (evt) => handleProfileFormSubmit(evt, profileEditPopup));
 profileCloseButton.addEventListener('click', () => closeModal(profileEditPopup));
@@ -67,8 +91,6 @@ profileAddCloseButton.addEventListener('click', () => closeModal(profileAddPopup
 profileAddForm.addEventListener('submit', (evt) => handleAddCardFormSubmit(evt, profileAddPopup, cardTemplate, imagePopup));
 
 imageCloseButton.addEventListener('click', () => closeModal(imagePopup));
-
-document.addEventListener('keydown', (evt) => handleEscapeKey(evt, [profileEditPopup, profileAddPopup, imagePopup]));
 
 profileEditPopup.addEventListener('click', (evt) => handleOverlayClick(evt, profileEditPopup));
 profileAddPopup.addEventListener('click', (evt) => handleOverlayClick(evt, profileAddPopup));
