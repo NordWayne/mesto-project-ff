@@ -14,7 +14,7 @@ export function handleOverlayClick(evt, modalElement) {
   }
 }
 
-export function handleEscapeKey(evt) {
+function handleEscapeKey(evt) {
   if(evt.key === 'Escape') {
      closeModal(document.querySelector('.popup_is-opened'));
   }
