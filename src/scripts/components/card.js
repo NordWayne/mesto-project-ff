@@ -1,12 +1,4 @@
-import Api from "../../utils/Api.js";
-
-const api = new Api({
-  baseUrl: "https://mesto.nomoreparties.co/v1/cohort-mag-4",
-  headers: {
-      authorization:'76a4dd5f-64dc-4a0f-a5d3-565c2f5e1f91',
-      'Content-Type': 'application/json'
-  }
-})
+import { api } from "../../utils/Api.js";
 
 export function createCard(cardData, deleteCallback, cardTemplate, likeCallback, onCardImageClick, userId) {
   const cardElement = cardTemplate.content.querySelector('.card').cloneNode(true);
@@ -47,6 +39,8 @@ export function createCard(cardData, deleteCallback, cardTemplate, likeCallback,
 export function deleteCard(cardElement, cardId) {
   api.deleteCard(cardId).then(() => {
     cardElement.remove();
+  }).catch((err) => {
+    console.log(err);
   })
 }
 
@@ -55,11 +49,15 @@ export function handleLike(likeButton, cardData, likeCounter, event) {
     api.unlikeCard(cardData._id).then((res) => {
       likeButton.classList.remove("card__like-button_is-active");
       likeCounter.textContent = res.likes.length;
-    });
+    }).catch((err) => {
+      console.log(err);
+    })
   } else {
     api.likeCard(cardData._id).then((res) => {
       likeButton.classList.add("card__like-button_is-active");
       likeCounter.textContent = res.likes.length;
-    });
+    }).catch((err) => {
+      console.log(err);
+    })
   }
 } 

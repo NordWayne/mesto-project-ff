@@ -6,7 +6,7 @@ import {
   handleOverlayClick,
 } from "./components/modal.js";
 import FormValidator from "../utils/FormValidator.js";
-import Api from "../utils/Api.js";
+import { api } from "../utils/Api.js";
 const cardTemplate = document.querySelector("#card-template");
 const placesList = document.querySelector(".places__list");
 
@@ -61,32 +61,19 @@ const validationConfig = {
 
 const editFormValidator = new FormValidator(
   validationConfig,
-  profileEditPopup.querySelector(".popup__form")
+  profileForm
 );
 editFormValidator.enableValidation();
 const addFormValidator = new FormValidator(
   validationConfig,
-  profileAddPopup.querySelector(".popup__form")
+  profileAddForm
 );
 addFormValidator.enableValidation();
-const editAvatarFormValidator = new FormValidator(
-  validationConfig,
-  profileEditPopup.querySelector(".popup__form")
-);
-editAvatarFormValidator.enableValidation();
 const avatarFormValidator = new FormValidator(
   validationConfig,
-  profileAvatarPopup.querySelector(".popup__form")
+  profileAvatarForm
 );
 avatarFormValidator.enableValidation();
-
-const api = new Api({
-  baseUrl: "https://mesto.nomoreparties.co/v1/cohort-mag-4",
-  headers: {
-    authorization: "76a4dd5f-64dc-4a0f-a5d3-565c2f5e1f91",
-    "Content-Type": "application/json",
-  },
-});
 
 function setProfileInfo(name, description, avatar) {
   profileTitle.textContent = name;
@@ -111,6 +98,9 @@ function handleProfileFormSubmit(evt, popup) {
     .then((userInfo) => {
       setProfileInfo(userInfo.name, userInfo.about);
     })
+    .catch((err) => {
+      console.log(err);
+    })
     .finally(() => {
       closeModal(popup);
       profileSaveButton.textContent = "Сохранить";
@@ -120,14 +110,16 @@ function handleProfileFormSubmit(evt, popup) {
 function handleProfileAvatarFormSubmit(evt) {
   evt.preventDefault();
   profileAvatarSaveButton.textContent = "Сохранение...";
-  avatarFormValidator.resetValidation();
   api
     .editUserAvatar(profileAvatarInput.value)
     .then((userInfo) => {
       setProfileInfo(userInfo.name, userInfo.about, userInfo.avatar);
+      closeModal(profileAvatarPopup);
+    })
+    .catch((err) => {
+      console.log(err);
     })
     .finally(() => {
-      closeModal(profileAvatarPopup);
       profileAvatarSaveButton.textContent = "Сохранить";
     });
 }
@@ -154,32 +146,27 @@ function handleAddCardFormSubmit(evt, popup, cardTemplate) {
         onCardImageClick,
         userId
       );
-      placesList.insertBefore(cardElement, placesList.firstChild);
+      placesList.insertBefore(cardElement, placesList.firstChild);   
+      closeModal(popup);
+      form.reset();
+    })
+    .catch((err) => {
+      console.log(err);
     })
     .finally(() => {
       profileAddSaveButton.textContent = "Сохранить";
-      form.reset();
-      closeModal(popup);
     });
 }
 
-api.getInitialCards().then((cards) => {
-  cards.forEach((cardData) => {
-    const cardElement = createCard(
-      cardData,
-      deleteCard,
-      cardTemplate,
-      handleLike,
-      onCardImageClick,
-      userId
-    );
-    placesList.append(cardElement);
-  });
-});
-
-api.getUserInfo().then((userInfo) => {
+Promise.all([api.getUserInfo(), api.getInitialCards()]).then(([userInfo, cards]) => {
   setProfileInfo(userInfo.name, userInfo.about, userInfo.avatar);
   userId = userInfo._id;
+  cards.forEach((cardData) => {
+    const cardElement = createCard(cardData, deleteCard, cardTemplate, handleLike, onCardImageClick, userId);
+    placesList.append(cardElement);
+  });
+}).catch((err) => {
+  console.log(err);
 });
 
 profileEditButton.addEventListener("click", () => {

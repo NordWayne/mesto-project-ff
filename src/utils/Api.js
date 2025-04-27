@@ -1,4 +1,4 @@
-export default class Api{
+class Api{
     constructor({baseUrl, headers}) {
         this._baseUrl = baseUrl;
         this._headers = headers;
@@ -68,9 +68,12 @@ export default class Api{
         return Promise.reject(`Возникла ошибка: ${response.status}`);
     }
 
-
-
-
-
-
 }
+
+export const api = new Api({
+    baseUrl: "https://mesto.nomoreparties.co/v1/cohort-mag-4",
+    headers: {
+      authorization: "76a4dd5f-64dc-4a0f-a5d3-565c2f5e1f91",
+      "Content-Type": "application/json",
+    },
+  });
