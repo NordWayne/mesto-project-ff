@@ -37,7 +37,7 @@
 .popup__button{align-items:center;background:#000;border:none;border-radius:2px;color:#fff;display:flex;font-size:18px;height:50px;justify-content:center;line-height:22px;margin-top:48px;transition:visibility 0s,background .3s;width:100%}.popup__button:hover{background:rgba(0,0,0,.8);cursor:pointer}@media screen and (max-width:568px){.popup__button{font-size:14px;line-height:17px}}
 .popup__caption{color:#fff;font-size:12px;left:0;line-height:15px;margin:0;position:absolute;top:calc(100% + 10px)}
 .popup__image{display:block;max-height:100%;max-width:100%;-o-object-fit:cover;object-fit:cover}
-.popup__error{color:red;font-size:12px;line-height:15px}
+.popup__error{color:red;display:block;font-size:12px;height:34px;line-height:15px;margin-top:5px}
 .popup__input_state_invalid{border-bottom:1px solid red}
 .popup__button_invalid{background-color:#fff;border:1px solid #000;color:#000;cursor:not-allowed;opacity:.2}
 .popup__content_content_avatar{min-height:222px}
