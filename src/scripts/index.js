@@ -97,12 +97,12 @@ function handleProfileFormSubmit(evt, popup) {
     .editUserInfo(nameInput.value, descriptionInput.value)
     .then((userInfo) => {
       setProfileInfo(userInfo.name, userInfo.about);
+      closeModal(popup);
     })
     .catch((err) => {
       console.log(err);
     })
     .finally(() => {
-      closeModal(popup);
       profileSaveButton.textContent = "Сохранить";
     });
 }
@@ -220,7 +220,7 @@ profileAvatarPopup.addEventListener("click", (evt) =>
 
 profileAvatarButton.addEventListener("click", () => {
   openModal(profileAvatarPopup);
-  editAvatarFormValidator.resetValidation();
+  avatarFormValidator.resetValidation();
 });
 profileAvatarCloseButton.addEventListener("click", () =>
   closeModal(profileAvatarPopup)
